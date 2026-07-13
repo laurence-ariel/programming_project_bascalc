@@ -1,7 +1,60 @@
 {
     "questions": {
-        "1": {
-            "type": 
+        "optimization": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "derivative": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "integral": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "continuity": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "limit": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "chain_rule": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
+        },
+        "definite_integral": {
+            "questions": {
+                "1": {
+                    "question": {},
+                    "answer": {}
+                }
+            }
         }
     }
 }
