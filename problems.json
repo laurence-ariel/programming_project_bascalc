@@ -1,60 +1,116 @@
 {
-    "questions": {
-        "optimization": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
+  "questions": {
+    "optimization": {
+      "questions": {
+        "1": {
+          "question": "Gabriel, a homeowner, wants to fence a rectangular lot he recently bought to the landlord, since it is beside his house, there's a house wall that occupies one side of the house. He has 80 feet of fencing for the other three sides. Write the area A of the garden as a function of x only.",
+          "answer": "re:^(?:A\\(x\\)\\s*=\\s*)?(?:x\\s*(?:\\*|·|×)?\\s*\\(\\s*80\\s*-\\s*2(?:\\*|·|×)?x\\s*\\)|80(?:\\*|·|×)?x\\s*-\\s*2(?:\\*|·|×)?x(?:\\^2|[²³⁴⁵⁶]))(?:\\s*=\\s*.*)?\\s*$"
         },
-        "derivative": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
+        "2": {
+          "question": "Starbucks is planning to redesign a cup including a cap and a bottom layer that must hold a volume of 500 cm^3. State the domain of r.",
+          "answer": "re:^(?:r\\s*>\\s*0|positive|r\\s+is\\s+positive|greater\\s+than\\s+0|>0)$"
         },
-        "integral": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
-        },
-        "continuity": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
-        },
-        "limit": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
-        },
-        "chain_rule": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
-        },
-        "definite_integral": {
-            "questions": {
-                "1": {
-                    "question": {},
-                    "answer": {}
-                }
-            }
+        "3": {
+          "question": "Laurence needs a square sheet of cardboard for his art project, with 24 cm on each side, and a square of side length x cut from each corner. The flaps are folded up to form an open-top box. With that said, express the volume V as a function of x.",
+          "answer": "re:^(?:V\\(x\\)\\s*=\\s*)?x\\s*(?:\\*|·|×)?\\s*\\(\\s*24\\s*-\\s*2(?:\\*|·|×)?x\\s*\\)(?:\\^2|[²³⁴⁵⁶])(?:\\s*=\\s*.*)?\\s*$"
         }
+      }
+    },
+    "derivative": {
+      "questions": {
+        "1": {
+          "question": "y = (2x^2 + 5)(x - 3)",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?6(?:\\*|·|×)?x(?:\\^2|[²³⁴⁵⁶])\\s*-\\s*12(?:\\*|·|×)?x\\s*\\+\\s*5(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "2": {
+          "question": "y = (5x^3 - 2x + 7) / (x + 1)",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?\\(\\s*10(?:\\*|·|×)?x(?:\\^3|[³⁴⁵⁶])\\s*\\+\\s*15(?:\\*|·|×)?x(?:\\^2|[²³⁴⁵⁶])\\s*-\\s*9\\s*\\)\\s*/\\s*\\(\\s*x\\s*\\+\\s*1\\s*\\)(?:\\^2|[²³⁴⁵⁶])(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "3": {
+          "question": "y = 6x^4 + 3x^2 - 8x + 10",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?24(?:\\*|·|×)?x(?:\\^3|[³⁴⁵⁶])\\s*\\+\\s*6(?:\\*|·|×)?x\\s*-\\s*8(?:\\s*=\\s*.*)?\\s*$"
+        }
+      }
+    },
+    "integral": {
+      "questions": {
+        "1": {
+          "question": "∫ (3x^2 + 4x - 5) dx",
+          "answer": "x^3 + 2x^2 - 5x + c"
+        },
+        "2": {
+          "question": "∫ (6x^5 - 2x + 7) dx",
+          "answer": "x^6 - x^2 + 7x + c"
+        },
+        "3": {
+          "question": "∫ (4x^3 + 3x^2 - 6) dx",
+          "answer": "x^4 + x^3 - 6x + c"
+        }
+      }
+    },
+    "continuity": {
+      "questions": {
+        "1": {
+          "question": "Find if the function is continuous at x = 2: f(x) = x^2 + 3x - 1",
+          "answer": "re:^\\s*(?:continuous|yes|y|true|continuous(?:\\s+at\\s+x\\s*=\\s*2)?)(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "2": {
+          "question": "Find if the function is continuous at x = 1: f(x) = (x^2 - 1) / (x - 1)",
+          "answer": "re:^\\s*(?:discontinuous|no|n|false|discontinuous(?:\\s+at\\s+x\\s*=\\s*1)?)(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "3": {
+          "question": "Find the value of k that makes the function continuous at x = 3",
+          "answer": "re:^\\s*(?:k\\s*=\\s*)?2(?:\\s*=\\s*.*)?\\s*$"
+        }
+      }
+    },
+    "limit": {
+      "questions": {
+        "1": {
+          "question": "lim (x → 3) (2x^2 - 5x + 4)",
+          "answer": "7"
+        },
+        "2": {
+          "question": "lim (x → 2) (x^2 - 4) / (x - 2)",
+          "answer": "4"
+        },
+        "3": {
+          "question": "lim (x → 0) (sin x) / x",
+          "answer": "1"
+        }
+      }
+    },
+    "chain_rule": {
+      "questions": {
+        "1": {
+          "question": "y = (3x^2 + 5)^4",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?24(?:\\*|·|×)?x\\s*(?:\\*|·|×)?\\s*\\(3(?:\\*|·|×)?x(?:\\^2|[²³⁴⁵⁶])\\s*\\+\\s*5\\)(?:\\^3|[³⁴⁵⁶])(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "2": {
+          "question": "y = (5x - 2)^6",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?30\\s*(?:\\*|·|×)?\\s*\\(5(?:\\*|·|×)?x\\s*-\\s*2\\)(?:\\^5|[⁵⁴³²])(?:\\s*=\\s*.*)?\\s*$"
+        },
+        "3": {
+          "question": "y = sqrt(4x^2 + 1)",
+          "answer": "re:^(?:dy/dx\\s*=\\s*)?4(?:\\*|·|×)?x\\s*/\\s*sqrt\\(?4(?:\\*|·|×)?x(?:\\^2|[²³⁴⁵⁶])\\s*\\+\\s*1\\)?(?:\\s*=\\s*.*)?\\s*$"
+        }
+      }
+    },
+    "definite_integral": {
+      "questions": {
+        "1": {
+          "question": "∫_0^2 (3x^2 + 2) dx",
+          "answer": "[x^3 + 2x]_0^2 = (8 + 4) - (0) = 12"
+        },
+        "2": {
+          "question": "∫_1^3 (4x - 1) dx",
+          "answer": "[2x^2 - x]_1^3 = (18 - 3) - (2 - 1) = 15 - 1 = 14"
+        },
+        "3": {
+          "question": "∫_0^1 (6x^2 - 4x + 1) dx",
+          "answer": "[2x^3 - 2x^2 + x]_0^1 = (2 - 2 + 1) - 0 = 1"
+        }
+      }
     }
+  }
 }
