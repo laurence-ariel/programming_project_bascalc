@@ -3,6 +3,15 @@ import os
 import random
 import time
 
+# ANSI color codes
+BOLD = "\033[1m"
+CYAN = "\033[36m"
+GREEN = "\033[32m"
+RED = "\033[91m"
+YELLOW = "\033[33m"
+RESET = "\033[0m"
+CLEAR = "\033[2J\033[H"
+
 BASE_DIR = os.path.dirname(__file__)
 PROBLEMS_FILE = os.path.join(BASE_DIR, "problems.json")
 
@@ -105,30 +114,68 @@ def clamp(v, lo=0, hi=100):
     return max(lo, min(hi, v))
 
 
+def show_intro():
+    """Display the intro screen"""
+    print(CLEAR, end="")
+    print("-" * 60)
+    print(f"{BOLD}{CYAN}------- BasCalc: Mathematical Calculus Battle -------{RESET}")
+    print("-" * 60)
+    print(f"{BOLD}{YELLOW}------- A Two-Player Combat Game -------{RESET}")
+    print("-" * 60)
+    print("")
+    print(f"{BOLD}The Rules:{RESET}")
+    print("  • This is a two-player game")
+    print("  • Enter your name and your opponent's name")
+    print(f"  • Each round, both players enter a {BOLD}3-digit attack sequence{RESET}")
+    print(f"    Digits 1-7 correspond to math attacks:")
+    print(f"      {GREEN}1 = Optimization{RESET}   {GREEN}2 = Derivative{RESET}     {GREEN}3 = Integral{RESET}")
+    print(f"      {GREEN}4 = Continuity{RESET}     {GREEN}5 = Limit{RESET}          {GREEN}6 = Chain Rule{RESET}")
+    print(f"      {GREEN}7 = Definite Integral{RESET}")
+    print("")
+    print(f"  • {BOLD}Answer math questions{RESET} correctly to deal damage to your opponent")
+    print(f"  • Answer {BOLD}quickly (≤30 seconds){RESET} for bonus damage (+25%)")
+    print(f"  • Manage your {YELLOW}Brain Power{RESET} resource to execute attacks")
+    print(f"  • Some attacks can only be used once per round")
+    print(f"  • First player to reduce opponent HP to 0 wins!")
+    print("")
+    print("-" * 60)
+    print(f"{BOLD}{CYAN}May the Best Mathematician Win!{RESET}")
+    print("-" * 60)
+    print("")
+
+
+
 def main():
+    show_intro()
     problems = load_problems()
 
-    print("BasCalc primer — simple playable loop (prototype)")
-    p1 = input("Player 1 name: ").strip() or "Player1"
-    p2 = input("Player 2 name: ").strip() or "Player2"
+    p1 = input(f"{BOLD}Player 1 name: {RESET}").strip() or "Player1"
+    p2 = input(f"{BOLD}Player 2 name: {RESET}").strip() or "Player2"
 
     state = {
         p1: {"hp": 100, "brain": 150, "pending": 0, "used_once": set()},
         p2: {"hp": 100, "brain": 150, "pending": 0, "used_once": set()},
     }
 
+    print(CLEAR, end="")
+    print(f"{BOLD}{CYAN}=== Game Start ==={RESET}")
+    print(f"{BOLD}{CYAN}{p1}{RESET} vs {BOLD}{CYAN}{p2}{RESET}")
+    time.sleep(2)
+
     round_no = 1
     while state[p1]["hp"] > 0 and state[p2]["hp"] > 0:
-        print(f"\n=== Round {round_no} ===")
-        print(f"{p1}: {state[p1]['hp']} HP, {state[p1]['brain']} brain || {p2}: {state[p2]['hp']} HP, {state[p2]['brain']} brain")
+        print(CLEAR, end="")
+        print(f"{BOLD}{CYAN}=== Round {round_no} ==={RESET}")
+        print(f"{YELLOW}{p1}:{RESET} {GREEN}{state[p1]['hp']} HP{RESET}, {YELLOW}{state[p1]['brain']} brain{RESET} || {YELLOW}{p2}:{RESET} {GREEN}{state[p2]['hp']} HP{RESET}, {YELLOW}{state[p2]['brain']} brain{RESET}")
+        print("")
 
-        seq1 = input(f"{p1}, enter 3-digit attack sequence (digits 1-7): ")
+        seq1 = input(f"{BOLD}{p1}, enter 3-digit attack sequence (digits 1-7): {RESET}")
         while not is_valid_sequence(seq1):
-            seq1 = input("Invalid sequence. Try again: ")
+            seq1 = input(f"{RED}Invalid sequence. Try again: {RESET}")
 
-        seq2 = input(f"{p2}, enter 3-digit attack sequence (digits 1-7): ")
+        seq2 = input(f"{BOLD}{p2}, enter 3-digit attack sequence (digits 1-7): {RESET}")
         while not is_valid_sequence(seq2):
-            seq2 = input("Invalid sequence. Try again: ")
+            seq2 = input(f"{RED}Invalid sequence. Try again: {RESET}")
 
         # per-round flags
         state[p1]["used_once"] = set()
@@ -142,7 +189,7 @@ def main():
             for pl, other in ((p1, p2), (p2, p1)):
                 pending = state[pl].get("pending", 0)
                 if pending:
-                    print(f"{pl} releases deferred damage: {pending} to self")
+                    print(f"{RED}{pl} releases deferred damage: {pending} to self{RESET}")
                     state[pl]["hp"] -= pending
                     state[pl]["pending"] = 0
 
@@ -152,9 +199,9 @@ def main():
             # resolve player1 action
             atk1 = ATTACKS[a1]
             if atk1.get("once_per_round") and a1 in state[p1]["used_once"]:
-                print(f"{p1} tried to reuse {atk1['name']} this round — skipped")
+                print(f"{RED}{p1} tried to reuse {atk1['name']} this round — skipped{RESET}")
             elif state[p1]["brain"] < atk1["cost"]:
-                print(f"{p1} lacks brainpower for {atk1['name']} — skipped")
+                print(f"{RED}{p1} lacks brainpower for {atk1['name']} — skipped{RESET}")
             else:
                 state[p1]["brain"] -= atk1["cost"]
                 correct, quick = ask_question(p1, a1, problems)
@@ -162,14 +209,14 @@ def main():
                     damage = atk1["damage"]
                     if quick:
                         damage = int(damage * 1.25)
-                    print(f"{p1} succeeded: {a1} deals {damage} to {p2}")
+                    print(f"{GREEN}{p1} succeeded: {a1} deals {damage} to {p2}{RESET}")
                     state[p2]["hp"] -= damage
                     if atk1.get("two_turn"):
                         # store fraction to self for next turn as demonstration
                         state[p1]["pending"] += int(damage * 0.25)
                 else:
                     selfd = int(atk1["damage"] * atk1.get("fail_self_mult", 0.5))
-                    print(f"{p1} failed {a1}; takes {selfd} self-damage")
+                    print(f"{RED}{p1} failed {a1}; takes {selfd} self-damage{RESET}")
                     state[p1]["hp"] -= selfd
                 if atk1.get("once_per_round"):
                     state[p1]["used_once"].add(a1)
@@ -177,9 +224,9 @@ def main():
             # resolve player2 action (mirror)
             atk2 = ATTACKS[a2]
             if atk2.get("once_per_round") and a2 in state[p2]["used_once"]:
-                print(f"{p2} tried to reuse {atk2['name']} this round — skipped")
+                print(f"{RED}{p2} tried to reuse {atk2['name']} this round — skipped{RESET}")
             elif state[p2]["brain"] < atk2["cost"]:
-                print(f"{p2} lacks brainpower for {atk2['name']} — skipped")
+                print(f"{RED}{p2} lacks brainpower for {atk2['name']} — skipped{RESET}")
             else:
                 state[p2]["brain"] -= atk2["cost"]
                 correct, quick = ask_question(p2, a2, problems)
@@ -187,13 +234,13 @@ def main():
                     damage = atk2["damage"]
                     if quick:
                         damage = int(damage * 1.25)
-                    print(f"{p2} succeeded: {a2} deals {damage} to {p1}")
+                    print(f"{GREEN}{p2} succeeded: {a2} deals {damage} to {p1}{RESET}")
                     state[p1]["hp"] -= damage
                     if atk2.get("two_turn"):
                         state[p2]["pending"] += int(damage * 0.25)
                 else:
                     selfd = int(atk2["damage"] * atk2.get("fail_self_mult", 0.5))
-                    print(f"{p2} failed {a2}; takes {selfd} self-damage")
+                    print(f"{RED}{p2} failed {a2}; takes {selfd} self-damage{RESET}")
                     state[p2]["hp"] -= selfd
                 if atk2.get("once_per_round"):
                     state[p2]["used_once"].add(a2)
@@ -204,17 +251,28 @@ def main():
             state[p1]["brain"] = clamp(state[p1]["brain"], 0, 150)
             state[p2]["brain"] = clamp(state[p2]["brain"], 0, 150)
 
-            print(f"After sequence {i+1}: {p1}: {state[p1]['hp']} HP, {state[p1]['brain']} brain || {p2}: {state[p2]['hp']} HP, {state[p2]['brain']} brain")
+            print(f"After sequence {i+1}: {YELLOW}{p1}:{RESET} {GREEN}{state[p1]['hp']} HP{RESET}, {YELLOW}{state[p1]['brain']} brain{RESET} || {YELLOW}{p2}:{RESET} {GREEN}{state[p2]['hp']} HP{RESET}, {YELLOW}{state[p2]['brain']} brain{RESET}")
+            print("")
 
             # check end
             if state[p1]["hp"] <= 0 or state[p2]["hp"] <= 0:
                 break
 
         round_no += 1
+        time.sleep(1)
 
     # outcome
-    print("\nGame over")
-    print(f"Final: {p1}: {state[p1]['hp']} HP || {p2}: {state[p2]['hp']} HP")
+    print(CLEAR, end="")
+    print(f"{BOLD}{RED}=== Game Over ==={RESET}")
+    print(f"Final: {YELLOW}{p1}:{RESET} {GREEN}{state[p1]['hp']} HP{RESET} || {YELLOW}{p2}:{RESET} {GREEN}{state[p2]['hp']} HP{RESET}")
+    
+    winner = p1 if state[p1]["hp"] > 0 else (p2 if state[p2]["hp"] > 0 else "Nobody")
+    if winner != "Nobody":
+        print(f"\n{BOLD}{GREEN}🏆 {winner} wins! 🏆{RESET}")
+    else:
+        print(f"\n{BOLD}{YELLOW}It's a draw!{RESET}")
+    print("")
+
 
 
 if __name__ == "__main__":
