@@ -2,6 +2,7 @@ import json
 import os
 import random
 import time
+import re
 
 # ANSI color codes
 BOLD = "\033[1m"
@@ -84,7 +85,23 @@ def get_problem(problems, category):
 
 
 def is_valid_sequence(seq):
-    return isinstance(seq, str) and len(seq) == 3 and all(c in DIGIT_TO_CATEGORY for c in seq)
+    # Backwards-compatible boolean check using the regex parser
+    return parse_sequence(seq) is not None
+
+
+def parse_sequence(raw):
+    """Parse a player's free-form input and extract the first three digits 1-7.
+
+    Accepts inputs like '1 2 3', '1-2-3', 'digits:123', or 'abc1,2,3xyz'.
+    Returns a compact 3-character string like '123' or None if invalid.
+    """
+    if not isinstance(raw, str):
+        return None
+    # Find all digits in the 1-7 range
+    digits = re.findall(r"[1-7]", raw)
+    if len(digits) < 3:
+        return None
+    return "".join(digits[:3])
 
 
 def ask_question(player_name, category, problems):
@@ -98,9 +115,31 @@ def ask_question(player_name, category, problems):
     # interpret numeric expected answers
     correct = False
     try:
-        # try numeric compare
+        # numeric expected answer (int/float)
         if isinstance(a, (int, float)):
             correct = abs(float(ans) - float(a)) < 1e-6
+        elif isinstance(a, str):
+            a_str = a.strip()
+            ans_str = ans.strip()
+            # if the expected answer string looks numeric, compare numerically
+            try:
+                a_num = float(a_str)
+                correct = abs(float(ans_str) - a_num) < 1e-6
+            except Exception:
+                # regex support: prefix with "re:" or /pattern/flags
+                if a_str.startswith("re:"):
+                    pattern = a_str[3:]
+                    correct = bool(re.fullmatch(pattern, ans_str, re.IGNORECASE))
+                elif len(a_str) >= 2 and a_str[0] == "/" and a_str.rfind("/") > 0:
+                    last = a_str.rfind("/")
+                    pattern = a_str[1:last]
+                    flags = a_str[last+1:]
+                    re_flags = 0
+                    if "i" in flags:
+                        re_flags |= re.IGNORECASE
+                    correct = bool(re.fullmatch(pattern, ans_str, re_flags))
+                else:
+                    correct = ans_str.lower() == a_str.lower()
         else:
             correct = str(ans).strip().lower() == str(a).strip().lower()
     except Exception:
@@ -168,14 +207,19 @@ def main():
         print(f"{BOLD}{CYAN}=== Round {round_no} ==={RESET}")
         print(f"{YELLOW}{p1}:{RESET} {GREEN}{state[p1]['hp']} HP{RESET}, {YELLOW}{state[p1]['brain']} brain{RESET} || {YELLOW}{p2}:{RESET} {GREEN}{state[p2]['hp']} HP{RESET}, {YELLOW}{state[p2]['brain']} brain{RESET}")
         print("")
+        # short help note each round about accepted answer formats
+        print(f"{CYAN}Note:{RESET} Answers accept implicit multiplication (e.g. `2x` or `2*x`), Unicode mul `·` or `×`, superscripts (² ³ ⁴), and optional `= RHS`.")
+        print("")
 
-        seq1 = input(f"{BOLD}{p1}, enter 3-digit attack sequence (digits 1-7): {RESET}")
-        while not is_valid_sequence(seq1):
-            seq1 = input(f"{RED}Invalid sequence. Try again: {RESET}")
+        seq1_raw = input(f"{BOLD}{p1}, enter 3-digit attack sequence (digits 1-7): {RESET}")
+        seq1 = parse_sequence(seq1_raw)
+        while not seq1:
+            seq1 = parse_sequence(input(f"{RED}Invalid sequence. Try again: {RESET}"))
 
-        seq2 = input(f"{BOLD}{p2}, enter 3-digit attack sequence (digits 1-7): {RESET}")
-        while not is_valid_sequence(seq2):
-            seq2 = input(f"{RED}Invalid sequence. Try again: {RESET}")
+        seq2_raw = input(f"{BOLD}{p2}, enter 3-digit attack sequence (digits 1-7): {RESET}")
+        seq2 = parse_sequence(seq2_raw)
+        while not seq2:
+            seq2 = parse_sequence(input(f"{RED}Invalid sequence. Try again: {RESET}"))
 
         # per-round flags
         state[p1]["used_once"] = set()
