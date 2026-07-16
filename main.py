@@ -62,7 +62,7 @@ def fallback_question(category):
     if category == "limit":
         return ("Compute limit: lim_{x->0} (sin(x)/x). Answer as a number.", 1)
     if category == "derivative":
-        return ("Derivative: d/dx (x**2) at x=3.", 6)
+        return ("Derivative: `d/dx` (x**2) at x=3.", 6)
     if category == "integral":
         return ("Integral: int_0^1 2*x dx. Answer as a number.", 1)
     if category == "optimization":
@@ -70,10 +70,10 @@ def fallback_question(category):
     if category == "continuity":
         return ("Is f(x)=1/x continuous at x=0? (yes/no)", "no")
     if category == "chain_rule":
-        return ("Compute derivative of f(x)=(x**2 + 1)**2 at x=1.", 4)
+        return ("Compute derivative of f(x)=(x**2 + 1)**2 at x=1.", r"re:^8(?:\\.0+)?$")
     if category == "definite_integral":
         return ("Compute int_0^2 x dx.", 2)
-    return ("What is 1+1?", 2)
+    return ("Easter egg question :)", 67)
 
 
 def get_problem(problems, category):
