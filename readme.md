@@ -15,7 +15,7 @@
 	- Prompt both players for a validated 3-digit attack sequence (attack combinations are represented by 7 digits).
 	- Each chosen attack corresponds to a calculus-based problem that must be solved (for example, the limits attack will pose a limits problem).
 	- If the problem is solved incorrectly, the attack fails and a punishment is applied.
-	- A speed bonus is applied for solving correctly within ~30–45 seconds.
+	- A speed bonus is applied for solving correctly within ~90-120 seconds.
 
 ### Turn resolution
 - Resolve each round across three sub-sequences: execute each player's action, check brainpower costs/requirements, apply effects, print status, and check win conditions after each turn.
