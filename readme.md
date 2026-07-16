@@ -3,6 +3,11 @@
 ## Objectives
 - Reduce your opponent's HP to 0 before yours. A simultaneous 0 HP results in a double KO.
 
+## Running the Game -- Prerequisites 
+- Ensure that Python 3 is installed on your computer.
+- Ensure that problems.json is on the same folder/directory as main.py (the game file.)
+- Ensure that the file names of the game files are correct ("problems.json", "main.py)
+
 ## Setup
 - Initialize player names.
 - HP: maximum 100.
