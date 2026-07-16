@@ -84,6 +84,43 @@ def get_problem(problems, category):
     return fallback_question(category)
 
 
+def match_answer(ans, a):
+    """Return True if answer string `ans` matches expected `a`.
+
+    Supports numeric expected values, plain strings, and regex answers prefixed
+    with `re:` or slash-delimited `/pattern/flags`.
+    """
+    ans_str = str(ans).strip()
+    # numeric expected answer (int/float)
+    try:
+        if isinstance(a, (int, float)):
+            return abs(float(ans_str) - float(a)) < 1e-6
+        if isinstance(a, str):
+            a_str = a.strip()
+            # if the expected answer string looks numeric, compare numerically
+            try:
+                a_num = float(a_str)
+                return abs(float(ans_str) - a_num) < 1e-6
+            except Exception:
+                # regex support: prefix with "re:" or /pattern/flags
+                if a_str.startswith("re:"):
+                    pattern = a_str[3:]
+                    return bool(re.fullmatch(pattern, ans_str, re.IGNORECASE))
+                elif len(a_str) >= 2 and a_str[0] == "/" and a_str.rfind("/") > 0:
+                    last = a_str.rfind("/")
+                    pattern = a_str[1:last]
+                    flags = a_str[last+1:]
+                    re_flags = 0
+                    if "i" in flags:
+                        re_flags |= re.IGNORECASE
+                    return bool(re.fullmatch(pattern, ans_str, re_flags))
+                else:
+                    return ans_str.lower() == a_str.lower()
+    except Exception:
+        return ans_str.lower() == str(a).strip().lower()
+
+
+
 def is_valid_sequence(seq):
     # Backwards-compatible boolean check using the regex parser
     return parse_sequence(seq) is not None
@@ -111,39 +148,8 @@ def ask_question(player_name, category, problems):
     start = time.time()
     ans = input("Answer: ").strip()
     elapsed = time.time() - start
-
-    # interpret numeric expected answers
-    correct = False
-    try:
-        # numeric expected answer (int/float)
-        if isinstance(a, (int, float)):
-            correct = abs(float(ans) - float(a)) < 1e-6
-        elif isinstance(a, str):
-            a_str = a.strip()
-            ans_str = ans.strip()
-            # if the expected answer string looks numeric, compare numerically
-            try:
-                a_num = float(a_str)
-                correct = abs(float(ans_str) - a_num) < 1e-6
-            except Exception:
-                # regex support: prefix with "re:" or /pattern/flags
-                if a_str.startswith("re:"):
-                    pattern = a_str[3:]
-                    correct = bool(re.fullmatch(pattern, ans_str, re.IGNORECASE))
-                elif len(a_str) >= 2 and a_str[0] == "/" and a_str.rfind("/") > 0:
-                    last = a_str.rfind("/")
-                    pattern = a_str[1:last]
-                    flags = a_str[last+1:]
-                    re_flags = 0
-                    if "i" in flags:
-                        re_flags |= re.IGNORECASE
-                    correct = bool(re.fullmatch(pattern, ans_str, re_flags))
-                else:
-                    correct = ans_str.lower() == a_str.lower()
-        else:
-            correct = str(ans).strip().lower() == str(a).strip().lower()
-    except Exception:
-        correct = str(ans).strip().lower() == str(a).strip().lower()
+    # interpret expected answer using helper
+    correct = match_answer(ans, a)
 
     quick = elapsed <= 30
     return correct, quick
