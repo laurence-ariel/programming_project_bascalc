@@ -120,6 +120,18 @@ def match_answer(ans, a):
         return ans_str.lower() == str(a).strip().lower()
 
 
+def get_attack_damage(attack_key, quick=False):
+    """Return the (possibly boosted) damage for an attack key.
+
+    Uses the same 1.25x multiplier applied when `quick` is True.
+    """
+    atk = ATTACKS.get(attack_key, {})
+    base = int(atk.get("damage", 0))
+    if quick:
+        return int(base * 1.25)
+    return base
+
+
 
 def is_valid_sequence(seq):
     # Backwards-compatible boolean check using the regex parser
@@ -151,7 +163,8 @@ def ask_question(player_name, category, problems):
     # interpret expected answer using helper
     correct = match_answer(ans, a)
 
-    quick = elapsed <= 30
+    # Bonus window: answers given between 90 and 120 seconds (inclusive)
+    quick = 90 <= elapsed <= 120
     return correct, quick
 
 
@@ -178,7 +191,7 @@ def show_intro():
     print(f"      {GREEN}7 = Definite Integral{RESET}")
     print("")
     print(f"  • {BOLD}Answer math questions{RESET} correctly to deal damage to your opponent")
-    print(f"  • Answer {BOLD}quickly (≤30 seconds){RESET} for bonus damage (+25%)")
+    print(f"  • Answer {BOLD}within 90-120 seconds{RESET} for bonus damage (+25%)")
     print(f"  • Manage your {YELLOW}Brain Power{RESET} resource to execute attacks")
     print(f"  • Some attacks can only be used once per round")
     print(f"  • First player to reduce opponent HP to 0 wins!")
@@ -190,12 +203,20 @@ def show_intro():
 
 
 
-def main():
+def main(prev_p1=None, prev_p2=None):
     show_intro()
     problems = load_problems()
 
-    p1 = input(f"{BOLD}Player 1 name: {RESET}").strip() or "Player1"
-    p2 = input(f"{BOLD}Player 2 name: {RESET}").strip() or "Player2"
+    # reuse previous names when provided (on replay)
+    if prev_p1 is not None:
+        p1 = prev_p1
+    else:
+        p1 = input(f"{BOLD}Player 1 name: {RESET}").strip() or "Player1"
+
+    if prev_p2 is not None:
+        p2 = prev_p2
+    else:
+        p2 = input(f"{BOLD}Player 2 name: {RESET}").strip() or "Player2"
 
     state = {
         p1: {"hp": 100, "brain": 150, "pending": 0, "used_once": set()},
@@ -256,9 +277,7 @@ def main():
                 state[p1]["brain"] -= atk1["cost"]
                 correct, quick = ask_question(p1, a1, problems)
                 if correct and not (a1 == "derivative" and derivative_blocked and a2 == "integral"):
-                    damage = atk1["damage"]
-                    if quick:
-                        damage = int(damage * 1.25)
+                    damage = get_attack_damage(a1, quick)
                     print(f"{GREEN}{p1} succeeded: {a1} deals {damage} to {p2}{RESET}")
                     state[p2]["hp"] -= damage
                     if atk1.get("two_turn"):
@@ -281,9 +300,7 @@ def main():
                 state[p2]["brain"] -= atk2["cost"]
                 correct, quick = ask_question(p2, a2, problems)
                 if correct and not (a2 == "derivative" and derivative_blocked and a1 == "integral"):
-                    damage = atk2["damage"]
-                    if quick:
-                        damage = int(damage * 1.25)
+                    damage = get_attack_damage(a2, quick)
                     print(f"{GREEN}{p2} succeeded: {a2} deals {damage} to {p1}{RESET}")
                     state[p1]["hp"] -= damage
                     if atk2.get("two_turn"):
@@ -321,9 +338,26 @@ def main():
         print(f"\n{BOLD}{GREEN}🏆 {winner} wins! 🏆{RESET}")
     else:
         print(f"\n{BOLD}{YELLOW}It's a draw!{RESET}")
+
     print("")
 
+    return p1, p2
 
 
 if __name__ == "__main__":
-    main()
+    prev_p1 = None
+    prev_p2 = None
+    while True:
+        prev_p1, prev_p2 = main(prev_p1, prev_p2)
+        # prompt to play again or exit
+        play_again = input("Would you like to play again or quit? (R=Replay / E=Exit): ").strip().lower()
+        while play_again not in ("r", "e"):
+            print("Invalid input, enter 'R' to replay or 'E' to exit.")
+            play_again = input("Would you like to play again or quit? (R=Replay / E=Exit): ").strip().lower()
+        if play_again == "r":
+            print("Rebooting the game...\n")
+            time.sleep(1)
+            continue
+        else:
+            print("Thanks for playing. Exiting now.")
+            break
